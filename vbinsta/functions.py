@@ -1,7 +1,6 @@
 from instagrapi import Client
 import os
 import json
-from tqdm import tqdm
 
 
 def save_session(client, filepath):
@@ -59,9 +58,7 @@ def login(client, username, password, session_file):
         load_session(client, session_file)
     else:
         CODE = input("Enter the 2FA code: ")
-        with tqdm(total=100, desc="Logging in") as pbar:
-            client.login(username, password, verification_code=CODE,
-                         progress_callback=lambda progress: pbar.update(progress))
+        client.login(username, password, verification_code=CODE)
         if client.user_id:
             print("Login successful!")
         else:

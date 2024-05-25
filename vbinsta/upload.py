@@ -1,8 +1,11 @@
 import click
 from instagrapi import Client
-
-from .functions import login, upload_single_image, upload_carousel
+from rich.console import Console
 import os
+from .functions import login, upload_single_image, upload_carousel
+from .function_gpt import process_images
+from .choice_option import ChoiceOption
+
 
 USERNAME = os.getenv('INSTA_USERNAME')
 PASSWORD = os.getenv('INSTA_PASSWORD')
@@ -19,7 +22,39 @@ SESSION_FILE = os.path.expanduser("~/.vbinsta_session.json")
     multiple=True,
     help='Path to the image file to upload.'
 )
-def upload(image):
+@click.option(
+    "-p",
+    "--prompt",
+    cls=ChoiceOption,
+    type=click.Choice(
+        [
+            "Analyse this image and write an instagram caption with few hashtags, keep it under 1500 characters and conceptual.",
+            "prompt",
+        ],
+        case_sensitive=False),
+    prompt=True,
+    default=1,
+    show_default=True,
+    help="Prompt to use for the completion",
+)
+@click.option(
+    "-m",
+    "--model",
+    cls=ChoiceOption,
+    type=click.Choice(
+        [
+            "gpt-4o",
+            "gpt-4-turbo",
+            "gpt-4-turbo-preview",
+            "gpt-4-vision-preview",
+        ],
+        case_sensitive=False),
+    prompt=True,
+    default=1,
+    show_default=True,
+    help="Prompt to use for the completion",
+)
+def upload(image, prompt, model):
     client = Client()
     try:
         login(client, USERNAME, PASSWORD, SESSION_FILE)
@@ -27,13 +62,22 @@ def upload(image):
         print(f"An error occurred: {e}")
         return
 
+    if prompt == "prompt":
+        prompt = click.prompt("Enter the prompt: ")
+
+    caption = process_images(
+        image[0], prompt, model, os.getenv('OPENAI_API_KEY'), 1500)
     # Verify if the login was successful
     if client.user_id:
-        print("Login successful!")
+        print("Login successful!: @10xphysics")
         if len(image) == 1:
-            upload_single_image(client, image[0], 'Uploaded using vbinsta!')
+            with Console().status("Uploading image...", spinner="dots"):
+                upload_single_image(
+                    client, image[0], caption + "\n\n Captions generated using gpt-4o!")
         if len(image) > 1:
-            upload_carousel(client, image, 'Uploaded using vbinsta!')
+            with Console().status("Uploading carousel...", spinner="dots"):
+                upload_carousel(client, image, caption +
+                                "\n\n Captions generated using gpt-4o!")
 
     else:
         print("Login failed.")
