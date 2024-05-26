@@ -1,11 +1,9 @@
-import re
 import requests
 from rich.console import Console
 import pyperclip
 from typing import List
 import base64
 import subprocess
-import os
 from .token_cost_calculations import calculate_image_cost, calculate_input_cost, calculate_output_cost
 
 
@@ -60,7 +58,7 @@ def process_images(image_names: List[str], prompt: str, model: str, api_key: str
         str: First match of the LaTeX code in the response.
     """
     image_dicts = create_image_dicts(image_names)
-    title = os.path.basename(image_names[0]).split('.')[0] + ".tex"
+    # title = os.path.basename(image_names[0]).split('.')[0] + ".tex"
 
     headers = {
         "Content-Type": "application/json",
@@ -111,5 +109,5 @@ def process_images(image_names: List[str], prompt: str, model: str, api_key: str
 
     pyperclip.copy(message)
     subprocess.Popen(
-        f'pbpaste | bat -l txt --file-name "{title}"', shell=True)
+        f'pbpaste | bat -l txt --file-name "Caption"', shell=True)
     return message

@@ -1,6 +1,7 @@
 from instagrapi import Client
 import os
 import json
+from PIL import Image
 
 
 def save_session(client, filepath):
@@ -99,3 +100,25 @@ def upload_carousel(client: Client, paths: list, caption: str) -> dict:
 
     """
     client.album_upload(paths, caption)
+
+
+def resize_images(images: list, size: tuple) -> list:
+    """
+    Resizes a list of images to the specified size.
+
+    Args:
+        images (list): A list of image file paths.
+        size (tuple): The target size in pixels (width, height).
+
+    Returns:
+        list: A list of resized image file paths.
+
+    """
+    resized_images = []
+    for image_path in images:
+        with Image.open(image_path) as img:
+            resized_img = img.resize(size)
+            resized_path = f"resized_{os.path.basename(image_path)}"
+            resized_img.save(resized_path)
+            resized_images.append(resized_path)
+    return resized_images

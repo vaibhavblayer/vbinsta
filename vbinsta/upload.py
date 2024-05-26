@@ -5,6 +5,7 @@ import os
 from .functions import login, upload_single_image, upload_carousel
 from .function_gpt import process_images
 from .choice_option import ChoiceOption
+from .functions import resize_images
 
 
 USERNAME = os.getenv('INSTA_USERNAME')
@@ -66,7 +67,12 @@ def upload(image, prompt, model):
         prompt = click.prompt("Enter the prompt: ")
 
     caption = process_images(
-        image[0], prompt, model, os.getenv('OPENAI_API_KEY'), 1500)
+        resize_images(image, (800, 800)),
+        prompt,
+        model,
+        os.getenv('OPENAI_API_KEY'),
+        1500
+    )
     # Verify if the login was successful
     if client.user_id:
         print("Login successful!: @10xphysics")
