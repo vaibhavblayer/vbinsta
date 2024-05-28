@@ -5,7 +5,7 @@ import os
 from .functions import login, upload_single_image, upload_carousel
 from .function_gpt import process_images
 from .choice_option import ChoiceOption
-from .functions import resize_images
+# from .functions import resize_images
 
 
 USERNAME = os.getenv('INSTA_USERNAME')
@@ -29,6 +29,7 @@ SESSION_FILE = os.path.expanduser("~/.vbinsta_session.json")
     cls=ChoiceOption,
     type=click.Choice(
         [
+            "Analyse this image it contains a physics problem, describe the problem and discuss the solution approach, in caption format for insta in simple text, don't format for web page",
             "Analyse this image and write an instagram caption with few hashtags, keep it under 1500 characters and conceptual.",
             "prompt",
         ],
@@ -67,7 +68,7 @@ def upload(image, prompt, model):
         prompt = click.prompt("Enter the prompt: ")
 
     caption = process_images(
-        resize_images(image, (800, 800)),
+        image[0],
         prompt,
         model,
         os.getenv('OPENAI_API_KEY'),
