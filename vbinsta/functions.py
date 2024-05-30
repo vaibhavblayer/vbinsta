@@ -122,3 +122,26 @@ def resize_images(images: list, size: tuple) -> list:
             resized_img.save(resized_path)
             resized_images.append(resized_path)
     return resized_images
+
+
+def fetch_posts_info(client, no_of_posts):
+    # Get the last 5 media posts
+    medias = client.user_medias(client.user_id, amount=no_of_posts)
+
+    for media in medias:
+        # Get detailed information about the media post
+        media_info = client.media_info(media.id)
+
+        print(f"Post ID: {media_info.id}")
+        print(f"Caption: {media_info.caption_text}")
+        print(f"Likes: {media_info.like_count}")
+        # Shares information is not directly available
+        print("Comments:")
+
+        # Get the comments for the media post
+        comments = client.media_comments(media.id)
+
+        for comment in comments:
+            print(f"{comment.user.username}: {comment.text}")
+
+        print("\n")

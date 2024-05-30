@@ -1,5 +1,6 @@
 import click
 from .upload import upload
+from .fetch import fetch
 
 CONTEXT_SETTINGS = dict(
     help_option_names=[
@@ -16,3 +17,4 @@ def main():
 
 
 main.add_command(upload)
+main.add_command(fetch)

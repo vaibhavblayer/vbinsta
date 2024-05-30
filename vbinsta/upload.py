@@ -67,16 +67,17 @@ def upload(image, prompt, model):
     if prompt == "prompt":
         prompt = click.prompt("Enter the prompt: ")
 
-    caption = process_images(
-        image[0],
-        prompt,
-        model,
-        os.getenv('OPENAI_API_KEY'),
-        1500
-    )
     # Verify if the login was successful
     if client.user_id:
-        print("Login successful!: @10xphysics")
+        print("Login successful!: @10xphysics\n")
+        with Console().status("Processing images...", spinner="dots"):
+            caption = process_images(
+                image[0:1],
+                prompt,
+                model,
+                os.getenv('OPENAI_API_KEY'),
+                1500
+            )
         if len(image) == 1:
             with Console().status("Uploading image...", spinner="dots"):
                 upload_single_image(
