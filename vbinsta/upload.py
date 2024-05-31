@@ -1,11 +1,12 @@
 import click
-from instagrapi import Client
+from instagrapi.exceptions import PhotoNotUpload
 from rich.console import Console
 import os
-from .functions import login, upload_single_image, upload_carousel
+from .functions import upload_single_image, upload_carousel, delete_session_file
 from .function_gpt import process_images
 from .choice_option import ChoiceOption
 # from .functions import resize_images
+from .login import LOGIN
 
 
 USERNAME = os.getenv('INSTA_USERNAME')
@@ -57,9 +58,8 @@ SESSION_FILE = os.path.expanduser("~/.vbinsta_session.json")
     help="Prompt to use for the completion",
 )
 def upload(image, prompt, model):
-    client = Client()
     try:
-        login(client, USERNAME, PASSWORD, SESSION_FILE)
+        client = LOGIN()
     except Exception as e:
         print(f"An error occurred: {e}")
         return
@@ -78,14 +78,30 @@ def upload(image, prompt, model):
                 os.getenv('OPENAI_API_KEY'),
                 1500
             )
-        if len(image) == 1:
-            with Console().status("Uploading image...", spinner="dots"):
-                upload_single_image(
-                    client, image[0], caption + "\n\n Captions generated using gpt-4o!")
-        if len(image) > 1:
-            with Console().status("Uploading carousel...", spinner="dots"):
-                upload_carousel(client, image, caption +
-                                "\n\n Captions generated using gpt-4o!")
-
+        try:
+            if len(image) == 1:
+                with Console().status("Uploading image...", spinner="dots"):
+                    upload_single_image(
+                        client, image[0], caption + "\n\n Captions generated using gpt-4o!")
+            if len(image) > 1:
+                with Console().status("Uploading carousel...", spinner="dots"):
+                    upload_carousel(client, image, caption +
+                                    "\n\n Captions generated using gpt-4o!")
+        except PhotoNotUpload:
+            print("Upload failed. Re-authenticating...")
+            delete_session_file(SESSION_FILE)
+            try:
+                client = LOGIN()
+                # Retry upload after re-authentication
+                if len(image) == 1:
+                    with Console().status("Uploading image...", spinner="dots"):
+                        upload_single_image(
+                            client, image[0], caption + "\n\n Captions generated using gpt-4o!")
+                if len(image) > 1:
+                    with Console().status("Uploading carousel...", spinner="dots"):
+                        upload_carousel(client, image, caption +
+                                        "\n\n Captions generated using gpt-4o!")
+            except Exception as e:
+                print(f"Re-authentication failed: {e}")
     else:
         print("Login failed.")

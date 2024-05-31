@@ -8,7 +8,8 @@ from .login import LOGIN
     "-n",
     "--no_of_posts",
     default=5,
-
+    show_default=True,
+    help="Number of posts to fetch",
 )
 def fetch(no_of_posts):
     client = LOGIN()

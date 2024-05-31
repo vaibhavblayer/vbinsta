@@ -2,6 +2,12 @@ from instagrapi import Client
 import os
 import json
 from PIL import Image
+import subprocess
+
+
+def delete_session_file(session_file):
+    if os.path.exists(session_file):
+        os.remove(session_file)
 
 
 def save_session(client, filepath):
@@ -129,19 +135,27 @@ def fetch_posts_info(client, no_of_posts):
     medias = client.user_medias(client.user_id, amount=no_of_posts)
 
     for media in medias:
+        content = ""
+        title = ""
         # Get detailed information about the media post
         media_info = client.media_info(media.id)
 
-        print(f"Post ID: {media_info.id}")
-        print(f"Caption: {media_info.caption_text}")
-        print(f"Likes: {media_info.like_count}")
-        # Shares information is not directly available
-        print("Comments:")
+        # print(f"Post ID: {media_info.id}")
+        # print(f"Caption: {media_info.caption_text}")
+        # print(f"Likes: {media_info.like_count}")
+        # # Shares information is not directly available
+        # print("Comments:")
+
+        content += f"Post ID: {media_info.id}\n"
+        content += f"Caption: {media_info.caption_text}\n"
+        title += f"Post ID: {media_info.id}\t Likes: {media_info.like_count}\n"
 
         # Get the comments for the media post
         comments = client.media_comments(media.id)
 
         for comment in comments:
-            print(f"{comment.user.username}: {comment.text}")
+            # print(f"{comment.user.username}: {comment.text}")
+            content += f"{comment.user.username}: {comment.text}\n"
 
-        print("\n")
+        subprocess.Popen(
+            f'echo "{content}" | bat --file-name "{title}"', shell=True)
