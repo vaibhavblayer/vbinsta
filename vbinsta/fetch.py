@@ -7,7 +7,7 @@ from .login import LOGIN
 @click.option(
     "-n",
     "--no_of_posts",
-    default=5,
+    default=1,
     show_default=True,
     help="Number of posts to fetch",
 )

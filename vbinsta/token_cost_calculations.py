@@ -4,6 +4,17 @@ from typing import List
 
 
 def resize(width, height):
+    """
+    Resize the width and height of an image while maintaining the aspect ratio.
+
+    Args:
+        width (int): The original width of the image.
+        height (int): The original height of the image.
+
+    Returns:
+        tuple: A tuple containing the resized width and height.
+
+    """
     if width > 1024 or height > 1024:
         if width > height:
             height = int(height * 1024 / width)
@@ -24,14 +35,11 @@ def count_image_tokens(image_path: str):
     Returns:
         int: The number of tokens used by the image.
     """
-    # Open the image and get its size
     with Image.open(image_path) as img:
         width, height = img.size
 
-    # Resize the image if necessary
     width, height = resize(width, height)
 
-    # Calculate the number of tokens
     h = ceil(height / 512)
     w = ceil(width / 512)
     total = 85 + 170 * h * w

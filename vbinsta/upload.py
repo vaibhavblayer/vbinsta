@@ -5,7 +5,6 @@ import os
 from .functions import upload_single_image, upload_carousel, delete_session_file
 from .function_gpt import process_images
 from .choice_option import ChoiceOption
-# from .functions import resize_images
 from .login import LOGIN
 
 
