@@ -2,10 +2,10 @@ import click
 from instagrapi.exceptions import PhotoNotUpload
 from rich.console import Console
 import os
-from .functions import upload_single_image, upload_carousel, delete_session_file
+from .functions import upload_single_image, upload_carousel
 from .function_gpt import process_images
 from .choice_option import ChoiceOption
-from .login import LOGIN
+from .login import LOGIN, RELOGIN
 
 
 USERNAME = os.getenv('INSTA_USERNAME')
@@ -88,9 +88,8 @@ def upload(image, prompt, model):
                                     "\n\n Captions generated using gpt-4o!")
         except PhotoNotUpload:
             print("Upload failed. Re-authenticating...")
-            delete_session_file(SESSION_FILE)
             try:
-                client = LOGIN()
+                client = RELOGIN()
                 # Retry upload after re-authentication
                 if len(image) == 1:
                     with Console().status("Uploading image...", spinner="dots"):

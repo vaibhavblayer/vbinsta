@@ -1,6 +1,7 @@
 from instagrapi import Client
 import os
 import json
+from rich.console import Console
 
 USERNAME = os.getenv('INSTA_USERNAME')
 PASSWORD = os.getenv('INSTA_PASSWORD')
@@ -45,6 +46,21 @@ def load_session(client, filepath):
     print("Session loaded!")
 
 
+def delete_session_file(session_file):
+    """
+    Deletes the specified session file if it exists.
+
+    Args:
+        session_file (str): The path to the session file.
+
+    Returns:
+        None
+    """
+    if os.path.exists(session_file):
+        os.remove(session_file)
+        print("Session file deleted!")
+
+
 def login(client, username, password, session_file):
     """
     Logs in the client using the provided username and password.
@@ -73,7 +89,24 @@ def login(client, username, password, session_file):
 def LOGIN():
     client = Client()
     try:
-        login(client, USERNAME, PASSWORD, SESSION_FILE)
+        with Console().status("Logging in...", spinner="dots"):
+            login(client, USERNAME, PASSWORD, SESSION_FILE)
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return
+
+    if client.user_id:
+        print("Login successful!: @10xphysics\n")
+
+    return client
+
+
+def RELOGIN():
+    client = Client()
+    delete_session_file(SESSION_FILE)
+    try:
+        with Console().status("Logging in...", spinner="dots"):
+            login(client, USERNAME, PASSWORD, SESSION_FILE)
     except Exception as e:
         print(f"An error occurred: {e}")
         return

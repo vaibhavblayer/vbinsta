@@ -5,21 +5,6 @@ from PIL import Image
 import subprocess
 
 
-def delete_session_file(session_file):
-    """
-    Deletes the specified session file if it exists.
-
-    Args:
-        session_file (str): The path to the session file.
-
-    Returns:
-        None
-    """
-    if os.path.exists(session_file):
-        os.remove(session_file)
-        print("Session file deleted!")
-
-
 def get_user_info(username: str) -> dict:
     pass
 
